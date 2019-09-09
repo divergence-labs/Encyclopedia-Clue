@@ -6,17 +6,19 @@
 // There are three sections, Text Strings, Skill Code, and Helper Function(s).
 // You can copy and paste the contents as the code for a new Lambda function, using the alexa-skill-kit-sdk-factskill template.
 // This code includes helper functions for compatibility with versions of the SDK prior to 1.0.9, which includes the dialog directives.
-
-
-
  // 1. Text strings =====================================================================================================
  //    Modify these strings and messages to change the behavior of your Lambda function
-
-let speechOutput_hist;
 let speechOutput;
 let reprompt;
-let welcomeOutput = "Hey, Welcome to Encyclopedia Journey .  It’s always the journey that matters than the destination . Let’s explore our new adventure . Are you ready?";
-let welcomeReprompt = "you would like to know the facts of science?";
+let question =1;
+let count_1= 0;
+let count_2= 0;
+let count_3 = 0;
+let score = 0;
+let welcome = "Welcome to Clue Hunt,\t";
+let welcomeOutput= welcome + "\t Lets Get Started. \t  "
+let question1= welcomeOutput + "\t Find this famous personality . \tThe Person who helped to end the Civil War and rallied against slavery ?";
+let welcomeReprompt = "";
 // 2. Skill Code =======================================================================================================
 "use strict";
 const Alexa = require('alexa-sdk');
@@ -24,20 +26,13 @@ const APP_ID = undefined;  // TODO replace with your app ID (OPTIONAL).
 speechOutput = '';
 const handlers = {
 	'LaunchRequest': function () {
-		this.emit(':ask', welcomeOutput, welcomeReprompt);
+		this.emit(':ask', question1, welcomeReprompt);
 	},
 	'AMAZON.HelpIntent': function () {
-		speechOutput = 'How can I help you?';
+		speechOutput = 'For Help, Please visit: https://www.britannica.com/';
 		reprompt = '';
-		this.emit(':ask', speechOutput, reprompt);
-	},
-	 'AMAZON.YesIntent': function () {
-		speechOutput = 'I am Glad you said yes!!! Would you like to start your journey with Ancient history?  Historical places? or  Literature?';
-		this.emit(':ask', speechOutput);
-	},
-	 'AMAZON.NoIntent': function () {
-		speechOutput = 'Cool !! Have a nice day Buddy !!!!';
-		this.emit(':tell', speechOutput);
+		this.emit(':tell', speechOutput, reprompt);
+
 	},
    'AMAZON.CancelIntent': function () {
 		speechOutput = 'okay,Cancelled the service';
@@ -53,85 +48,106 @@ const handlers = {
 		this.emit(':tell', speechOutput);
    },
 	'AMAZON.FallbackIntent': function () {
-		speechOutput = 'Sorry I could not understand that...';
-
 		//any intent slot variables are listed here for convenience
-
-
 		//Your custom intent handling goes here
-		speechOutput = "Sorry I could not understand that...";
+		speechOutput = "Sorry I could not understand that...Please visit  https://www.britannica.com/";
 		this.emit(":ask", speechOutput, speechOutput);
     },
 	'AMAZON.NavigateHomeIntent': function () {
 		speechOutput = '';
-
 		//any intent slot variables are listed here for convenience
-
-
 		//Your custom intent handling goes here
 		speechOutput = "This is a place holder response for the intent named AMAZON.NavigateHomeIntent. This intent has no slots. Anything else?";
 		this.emit(":ask", speechOutput, speechOutput);
     },
-	'InterestingTopics': function () {
+	'QuizAnswer': function () {
+	  
 		speechOutput = '';
-
 		//any intent slot variables are listed here for convenience
-
-		let TopicsSlotRaw = this.event.request.intent.slots.Topics.value;
-		console.log(TopicsSlotRaw);
-		let TopicsSlot = resolveCanonical(this.event.request.intent.slots.Topics);
-		console.log(TopicsSlot);
-		var topics = {
-		    'ancient history': ' Great!! As Martin Luther King, Jr. famously said. “We are not the makers of History. We are made by history." Let’s dig deep into it and see can we create one. Are you interested in Roman Empire? or Greek Dynasty?  ',
-		    'historical places': 'A place is only as good as the people in it. History add some values to it. Would you like to explore more about. The Pyramids at Giza? or The Taj Mahal?  ',
-		    'literature':'T.S. Eliot once said. "The purpose of Literature is to turn blood to Ink. With that in mind. Do you want to know more about William Shakesphere ? or John Keats? "'}
-		
-		var topic = TopicsSlot.toLowerCase();
-		if(TopicsSlot && topics[topic]){
-		    var infonote = topics[topic];
-		//Your custom intent handling goes here
-		speechOutput = infonote;
-		this.emit(":ask", speechOutput, '');
+		let TopicsSlotRaw = this.event.request.intent.slots.Answers.value;
+		console.log(TopicsSlotRaw);	
+	   
+	        
+		if(((TopicsSlotRaw.toLowerCase()=="abraham lincoln") || (TopicsSlotRaw.toLowerCase()=="abrham lincoln") || (TopicsSlotRaw.toLowerCase()=="lincoln")) && question == 1){
+		score = 0;
+		count_1=0;
+		speechOutput ="Correct! Great job.  Let's Move on. Here's your next personality . This person was awarded the Nobel Peace Prize in 2009";
+	    reprompt = "";
+	    question=2;
+	    score= score + 10;
+		this.emit(":ask", speechOutput, reprompt);
 		}
-		else{
-		    	speechOutput = "The topic you asked for is not supported";
-		    	reprompt = "";
-		    	this.emit(":ask", speechOutput,reprompt );
+		else if(question == 2 ){
+		if(TopicsSlotRaw.toLowerCase()=="barack obama" || TopicsSlotRaw.toLowerCase()=="barak obama" || TopicsSlotRaw.toLowerCase()=="obama"){
+		count_2=0;
+        score = score + 10;
+        speechOutput ="Correct! Great job. Let's Move on. Here's your next personality . A German born theoritical physicist who developed Theory of Relativity";
+        reprompt = "";
+        question = 3;
+        this.emit(":ask", speechOutput, reprompt);
 		}
-    },
-    'TopicHistory': function () {
-		speechOutput_hist = '';
-
-		//any intent slot variables are listed here for convenience
-
-		let TopicsSlotRawHist = this.event.request.intent.slots.TopicHist.value;
-		console.log(TopicsSlotRawHist);
-		let TopicsSlotHist = resolveCanonical(this.event.request.intent.slots.TopicHist);
-		console.log(TopicsSlotHist);
-		var topics_hist = {
-		    'roman empire' : ' Its Roman !!!  The Roman Empire was among the most powerful, economic, cultural, political and military forces in the world of its time. At the height of the Roman Empire, a number of key emperors helped to elevate Rome. granting a lasting influence for centuries to come—including such notable names are Augustus. and Marcus . Whom would you like to conquer more about ?  ',
-		    'greek' : ' <voice name="Brian"><lang xml:lang="en-US"> Greek Dynasty. As we all know. The history of Greece encompasses the territory of the modern nation state of Greece. as well as that of the Greek people and the areas they inhabited and ruled historically. Among those great rulers, would you like to know more about  King of athens? or Kings of Sparta? </lang></voice> ',
-		    'roman' : ' Its Roman !!!  The Roman Empire was among the most powerful, economic, cultural, political and military forces in the world of its time. At the height of the Roman Empire, a number of key emperors helped to elevate Rome. granting a lasting influence for centuries to come—including such notable names are Augustus. and Marcus . Whom would you like to conquer more about ?  ',
-		    'greek dynasty': ' <voice name="Brian"><lang xml:lang="en-US"> Greek Dynasty. As we all know. The history of Greece encompasses the territory of the modern nation state of Greece. as well as that of the Greek people and the areas they inhabited and ruled historically. Among those great rulers, would you like to know more about  King of athens? or Kings of Sparta? </lang></voice> ',
-		    'marcus':'Marcus Aurelius is one of the most revered emperors in history, known for his intellectual prowess; his personal writings on stoicism are considered some of the most comprehensive of all time. With that historical information. Would you like to continue your journey with Historical places? or Literature?  ',
-		    'augustus':'Augustus was the great-nephew of Julius Caesar and reigned after Caesar’s death. He was highly regarded by the Senate, which eventually gave him the name of Augustus. With that historical information. Would you like to continue your journey with Historical places? or Literature ?'
+        else{	
+        ++count_2;
+        if (count_2 <= 1){
+            speechOutput = "Not Quite Buddy!! Here's your Clue, He was the 44th President of United States";
+             reprompt = "";
+                this.emit(':ask', speechOutput, reprompt);
         }
-		var topic_hist = TopicsSlotHist.toLowerCase();
-		if(TopicsSlotHist && topics_hist[topic_hist]){
-		    var infonote_hist = topics_hist[topic_hist];
-		//Your custom intent handling goes here
-		speechOutput_hist = infonote_hist;
-		this.emit(":ask", speechOutput_hist, '');
+        else
+         {       
+            speechOutput = "Wrong Answer!!! The answer is Barak Obama. He won the nobel Peace prize in 2009, Thanks for your participation,  Happy Learning Buddy !!";
+            reprompt = "";
+            this.emit(':tell', speechOutput, reprompt);
+            count_2= 0;
+            question = 1;
+        }
+    }
+}
+else if (question == 3){
+    if(TopicsSlotRaw.toLowerCase()=="albert einstein" || TopicsSlotRaw.toLowerCase()== "einstein"){
+        count_3=0;
+        score = score + 10;
+        speechOutput ="Correct! Great job. Thanks for Participating, your score is "+ score + " on 30 . Happy Learning Buddy !! ";
+        reprompt = "";
+        question = 1;
+        this.emit(":tell", speechOutput, reprompt);
 		}
-		else{
-		    	speechOutput_hist = "The topic you asked for is not supported.";
+        else{	
+        ++count_3;
+        if (count_3 <= 1){
+            speechOutput = "Hmmmm!!! Not Quite !! Here's your Clue, In 1921, He won the Nobel Prize in Physics ";
+             reprompt = "";
+                this.emit(':ask', speechOutput, reprompt);
+        }
+        else
+         {       
+            speechOutput = "Wrong Answer!!! The answer is Albert Einstein . He Developed Theory of Relativity, Thanks for your participation,  Happy Learning Buddy !!";
+            reprompt = "";
+            this.emit(':tell', speechOutput, reprompt);
+            count_3= 0;
+            question = 1;
+            }
+    }
+}
+		else{	
+		    ++count_1;
+		    if (count_1 <= 1){
+		     speechOutput = "Not Quite!!! Let me give you a Clue, He was the 16th President of United States";
 		    	reprompt = "";
-		    	this.emit(":ask", speechOutput_hist,reprompt );
+		    	 this.emit(':ask', speechOutput, reprompt);
+	    	}
+		    else
+		    {       
+		       speechOutput = "Wrong Answer!!! The answer is Abraham Lincoln . Lincoln helped to end the Civil War and rallied against slavery, Thanks for your participation, Happy Learning Buddy !! ";
+		    	reprompt = "";
+		    	 this.emit(':tell', speechOutput, reprompt);
+		    	 count_1= 0;
+	    	}
 		}
-    },
+	},
 	'Unhandled': function () {
-        speechOutput_hist = "The skill didn't quite understand what you wanted.  Do you want to try something else?";
-        this.emit(':ask', speechOutput_hist, '');
+        speechOutput = "The skill didn't quite understand what you wanted.  Do you want to try something else?";
+        this.emit(':ask', speechOutput, speechOutput);
     }
 };
 
